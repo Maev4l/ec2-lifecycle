@@ -1,0 +1,23 @@
+{
+  "name": "ec2-lifecycle",
+  "scripts": {
+    "deploy": "npx sls deploy",
+    "undeploy": "npx sls remove",
+    "build": "npx sls webpack"
+  },
+  "devDependencies": {
+    "@babel/core": "7.16.5",
+    "@babel/plugin-transform-runtime": "7.16.5",
+    "@babel/preset-env": "7.16.5",
+    "babel-loader": "8.2.3",
+    "serverless": "2.70.0",
+    "serverless-webpack": "5.6.0",
+    "webpack": "5.65.0",
+    "webpack-node-externals": "3.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ec2": "3.45.0",
+    "@babel/runtime": "7.16.5",
+    "winston": "3.3.3"
+  }
+}

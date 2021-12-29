@@ -1,0 +1,49 @@
+service: ec2-lifecycle
+
+plugins:
+  - serverless-webpack
+
+custom:
+  webpack:
+    webpackConfig: "./webpack.base.config.js"
+    includeModules:
+      forceExclude:
+        - aws-sdk
+    packager: "yarn"
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  versionFunctions: false
+  memorySize: 1024
+  region: "eu-central-1"
+  profile: serverless-admin-profile
+  timeout: 30
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "ec2:DescribeInstances"
+            - "ec2:StartInstances"
+            - "ec2:StopInstances"
+            - "ec2:TerminateInstances"
+          Resource: "*"
+  tags:
+    application: "ec2-lifecycle"
+    owner: "serverless"
+  stackTags:
+    application: "ec2-lifecycle"
+    owner: "serverless"
+  deploymentBucket:
+    blockPublicAccess: true
+    tags:
+      application: "ec2-lifecycle"
+      owner: "serverless"
+  environment:
+    REGION: "eu-central-1"
+
+functions:
+  ec2lifecycle:
+    handler: src/index.lifecycle
+    name: ec2-lifecycle
