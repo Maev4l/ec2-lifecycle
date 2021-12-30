@@ -29,13 +29,13 @@ const getInstances = async (input) => {
     for (const reservation of Reservations) {
       const { Instances } = reservation;
       Instances.forEach((i) => {
-        const { InstanceId, Tags } = i;
+        const { InstanceId, Tags, State } = i;
         const tags = Tags.reduce((obj, t) => {
           const { Key, Value } = t;
           obj[Key] = Value;
           return obj;
         }, {});
-        instances.push({ InstanceId, Tags: tags });
+        instances.push({ InstanceId, Tags: tags, State });
       });
     }
   }
@@ -44,7 +44,9 @@ const getInstances = async (input) => {
 
 const stopInstances = async (instances) => {
   const stopInstancesCommand = new StopInstancesCommand({
-    InstanceIds: instances.map((i) => i.InstanceId),
+    InstanceIds: instances
+      .filter((i) => i.State.Name === "running")
+      .map((i) => i.InstanceId),
   });
 
   const { StoppingInstances } = await client.send(stopInstancesCommand);
@@ -53,7 +55,9 @@ const stopInstances = async (instances) => {
 
 const startInstances = async (instances) => {
   const startInstancesCommand = new StartInstancesCommand({
-    InstanceIds: instances.map((i) => i.InstanceId),
+    InstanceIds: instances
+      .filter((i) => i.State.Name === "stopped")
+      .map((i) => i.InstanceId),
   });
 
   const { StartingInstances } = await client.send(startInstancesCommand);
