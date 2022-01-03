@@ -43,25 +43,33 @@ const getInstances = async (input) => {
 };
 
 const stopInstances = async (instances) => {
-  const stopInstancesCommand = new StopInstancesCommand({
-    InstanceIds: instances
-      .filter((i) => i.State.Name === "running")
-      .map((i) => i.InstanceId),
-  });
+  const targets = instances
+    .filter((i) => i.State.Name === "running")
+    .map((i) => i.InstanceId);
 
-  const { StoppingInstances } = await client.send(stopInstancesCommand);
-  logger.info(`Instances status: ${JSON.stringify(StoppingInstances)}`);
+  if (targets && targets.length > 0) {
+    const stopInstancesCommand = new StopInstancesCommand({
+      InstanceIds: targets,
+    });
+
+    const { StoppingInstances } = await client.send(stopInstancesCommand);
+    logger.info(`Instances status: ${JSON.stringify(StoppingInstances)}`);
+  }
 };
 
 const startInstances = async (instances) => {
-  const startInstancesCommand = new StartInstancesCommand({
-    InstanceIds: instances
-      .filter((i) => i.State.Name === "stopped")
-      .map((i) => i.InstanceId),
-  });
+  const targets = instances
+    .filter((i) => i.State.Name === "stopped")
+    .map((i) => i.InstanceId);
 
-  const { StartingInstances } = await client.send(startInstancesCommand);
-  logger.info(`Instances status: ${JSON.stringify(StartingInstances)}`);
+  if (targets && targets.length > 0) {
+    const startInstancesCommand = new StartInstancesCommand({
+      InstanceIds: targets,
+    });
+
+    const { StartingInstances } = await client.send(startInstancesCommand);
+    logger.info(`Instances status: ${JSON.stringify(StartingInstances)}`);
+  }
 };
 
 export const lifecycle = async (event) => {
@@ -81,4 +89,9 @@ export const lifecycle = async (event) => {
   } else {
     logger.warn("No defined action. Valid values: (start|stop)");
   }
+
+  const result = await getInstances({
+    Filters: filters,
+  });
+  return result;
 };
