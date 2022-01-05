@@ -84,14 +84,20 @@ export const lifecycle = async (event) => {
   logger.info(`EC2 instances: ${JSON.stringify(instances)}`);
   if (action === "stop") {
     await stopInstances(instances);
+    return await getInstances({
+      Filters: filters,
+    });
   } else if (action === "start") {
     await startInstances(instances);
+    return await getInstances({
+      Filters: filters,
+    });
+  } else if (action === "list") {
+    return instances;
   } else {
-    logger.warn("No defined action. Valid values: (start|stop)");
+    logger.warn("No defined action. Valid values: (start|stop|list)");
+    return {
+      error: "No defined action. Valid values: (start|stop|list)",
+    };
   }
-
-  const result = await getInstances({
-    Filters: filters,
-  });
-  return result;
 };
